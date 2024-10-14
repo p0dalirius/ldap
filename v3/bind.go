@@ -606,6 +606,7 @@ type GSSAPIBindRequest struct {
 
 // GSSAPIBind performs the GSSAPI SASL bind using the provided GSSAPI client.
 func (l *Conn) GSSAPIBind(client GSSAPIClient, servicePrincipal, authzid string) error {
+	fmt.Printf("[debug] ldap/v3/ldap.Conn.GSSAPIBind()\n")
 	return l.GSSAPIBindRequest(client, &GSSAPIBindRequest{
 		ServicePrincipalName: servicePrincipal,
 		AuthZID:              authzid,
@@ -614,6 +615,7 @@ func (l *Conn) GSSAPIBind(client GSSAPIClient, servicePrincipal, authzid string)
 
 // GSSAPIBindRequest performs the GSSAPI SASL bind using the provided GSSAPI client.
 func (l *Conn) GSSAPIBindRequest(client GSSAPIClient, req *GSSAPIBindRequest) error {
+	fmt.Printf("[debug] ldap/v3/ldap.Conn.GSSAPIBindRequest()\n")
 	//nolint:errcheck
 	defer client.DeleteSecContext()
 
