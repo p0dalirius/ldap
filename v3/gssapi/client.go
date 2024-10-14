@@ -100,6 +100,7 @@ func (client *Client) DeleteSecContext() error {
 // GSS-API between the client and server.
 // See RFC 4752 section 3.1.
 func (client *Client) InitSecContext(target string, input []byte) ([]byte, bool, error) {
+	fmt.Printf("[debug] ldap/v3/gssapi/client.Client.InitSecContext()\n")
 	gssapiFlags := []int{gssapi.ContextFlagInteg, gssapi.ContextFlagConf, gssapi.ContextFlagMutual}
 
 	switch input {
@@ -159,6 +160,7 @@ func (client *Client) InitSecContext(target string, input []byte) ([]byte, bool,
 // NegotiateSaslAuth performs the last step of the SASL handshake.
 // See RFC 4752 section 3.1.
 func (client *Client) NegotiateSaslAuth(input []byte, authzid string) ([]byte, error) {
+	fmt.Printf("[debug] ldap/v3/gssapi/client.Client.NegotiateSaslAuth()\n")
 	token := &gssapi.WrapToken{}
 	err := token.Unmarshal(input, true)
 	if err != nil {
@@ -200,6 +202,13 @@ func (client *Client) NegotiateSaslAuth(input []byte, authzid string) ([]byte, e
 		SndSeqNum: 1,
 		Payload:   payload,
 	}
+
+	fmt.Printf("&gssapi.WrapToken{...}\n")
+	fmt.Printf(" | Flags     : %b\n", token.Flags)
+	fmt.Printf(" | EC        : %d\n", token.EC)
+	fmt.Printf(" | RRC       : %d\n", token.RRC)
+	fmt.Printf(" | SndSeqNum : %d\n", token.SndSeqNum)
+	fmt.Printf(" | Payload   : %x\n", token.Payload)
 
 	if err := token.SetCheckSum(key, keyusage.GSSAPI_INITIATOR_SEAL); err != nil {
 		return nil, err

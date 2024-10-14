@@ -206,6 +206,13 @@ func (client *Client) NegotiateSaslAuth(input []byte, authzid string) ([]byte, e
 		Payload:   payload,
 	}
 
+	fmt.Printf("&gssapi.WrapToken{...}\n")
+	fmt.Printf(" | Flags     : %b\n", token.Flags)
+	fmt.Printf(" | EC        : %d\n", token.EC)
+	fmt.Printf(" | RRC       : %d\n", token.RRC)
+	fmt.Printf(" | SndSeqNum : %d\n", token.SndSeqNum)
+	fmt.Printf(" | Payload   : %x\n", token.Payload)
+
 	if err := token.SetCheckSum(key, keyusage.GSSAPI_INITIATOR_SEAL); err != nil {
 		return nil, err
 	}
