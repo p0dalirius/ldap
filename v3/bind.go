@@ -670,9 +670,9 @@ func (l *Conn) saslBindTokenExchange(reqControls []Control, reqToken []byte) ([]
 	request := ber.Encode(ber.ClassApplication, ber.TypeConstructed, ApplicationBindRequest, nil, "Bind Request")
 	request.AppendChild(ber.NewInteger(ber.ClassUniversal, ber.TypePrimitive, ber.TagInteger, 3, "Version"))
 	// Changed here to Administrator to test
-	request.AppendChild(ber.NewString(ber.ClassUniversal, ber.TypePrimitive, ber.TagOctetString, "Administrator", "User Name"))
+	request.AppendChild(ber.NewString(ber.ClassUniversal, ber.TypePrimitive, ber.TagOctetString, "", "User Name"))
 
-	auth := ber.Encode(ber.ClassContext, ber.TypeConstructed, 3, "", "authentication")
+	auth := ber.Encode(ber.ClassContext, ber.TypeConstructed, 3, "Administrator", "authentication")
 	auth.AppendChild(ber.NewString(ber.ClassUniversal, ber.TypePrimitive, ber.TagOctetString, "GSSAPI", "SASL Mech"))
 	if len(reqToken) > 0 {
 		auth.AppendChild(ber.NewString(ber.ClassUniversal, ber.TypePrimitive, ber.TagOctetString, string(reqToken), "Credentials"))
