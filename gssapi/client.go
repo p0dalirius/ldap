@@ -29,7 +29,7 @@ type Client struct {
 // NewClientWithKeytab creates a new client from a keytab credential.
 // Set the realm to empty string to use the default realm from config.
 func NewClientWithKeytab(username, realm, keytabPath, krb5confPath string, settings ...func(*client.Settings)) (*Client, error) {
-	fmt.Printf("[debug] ldap/gssapi/NewClientWithKeytab()\n")
+	fmt.Printf("[debug] ldap/gssapi/client.go::NewClientWithKeytab()\n")
 	krb5conf, err := config.Load(krb5confPath)
 	if err != nil {
 		return nil, err
@@ -50,7 +50,7 @@ func NewClientWithKeytab(username, realm, keytabPath, krb5confPath string, setti
 // NewClientWithPassword creates a new client from a password credential.
 // Set the realm to empty string to use the default realm from config.
 func NewClientWithPassword(username, realm, password string, krb5confPath string, settings ...func(*client.Settings)) (*Client, error) {
-	fmt.Printf("[debug] ldap/gssapi/NewClientWithPassword()\n")
+	fmt.Printf("[debug] ldap/gssapi/client.go::NewClientWithPassword()\n")
 	krb5conf, err := config.Load(krb5confPath)
 	if err != nil {
 		return nil, err
@@ -65,7 +65,7 @@ func NewClientWithPassword(username, realm, password string, krb5confPath string
 
 // NewClientFromCCache creates a new client from a populated client cache.
 func NewClientFromCCache(ccachePath, krb5confPath string, settings ...func(*client.Settings)) (*Client, error) {
-	fmt.Printf("[debug] ldap/gssapi/NewClientFromCCache()\n")
+	fmt.Printf("[debug] ldap/gssapi/client.go::NewClientFromCCache()\n")
 	krb5conf, err := config.Load(krb5confPath)
 	if err != nil {
 		return nil, err
@@ -103,7 +103,7 @@ func (client *Client) DeleteSecContext() error {
 // GSS-API between the client and server.
 // See RFC 4752 section 3.1.
 func (client *Client) InitSecContext(target string, input []byte) ([]byte, bool, error) {
-	fmt.Printf("[debug] ldap/gssapi/client.Client.InitSecContext()\n")
+	fmt.Printf("[debug] ldap/gssapi/client.go::client.Client.InitSecContext()\n")
 	gssapiFlags := []int{gssapi.ContextFlagInteg, gssapi.ContextFlagConf, gssapi.ContextFlagMutual}
 
 	switch input {
@@ -163,7 +163,7 @@ func (client *Client) InitSecContext(target string, input []byte) ([]byte, bool,
 // NegotiateSaslAuth performs the last step of the SASL handshake.
 // See RFC 4752 section 3.1.
 func (client *Client) NegotiateSaslAuth(input []byte, authzid string) ([]byte, error) {
-	fmt.Printf("[debug] ldap/gssapi/client.Client.NegotiateSaslAuth()\n")
+	fmt.Printf("[debug] ldap/gssapi/client.go::client.Client.NegotiateSaslAuth()\n")
 	token := &gssapi.WrapToken{}
 	err := token.Unmarshal(input, true)
 	if err != nil {

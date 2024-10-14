@@ -606,7 +606,7 @@ type GSSAPIBindRequest struct {
 
 // GSSAPIBind performs the GSSAPI SASL bind using the provided GSSAPI client.
 func (l *Conn) GSSAPIBind(client GSSAPIClient, servicePrincipal, authzid string) error {
-	fmt.Printf("[debug] ldap/v3/ldap.Conn.GSSAPIBind()\n")
+	fmt.Printf("[debug] ldap/v3/bind.go::ldap.Conn.GSSAPIBind()\n")
 	return l.GSSAPIBindRequest(client, &GSSAPIBindRequest{
 		ServicePrincipalName: servicePrincipal,
 		AuthZID:              authzid,
@@ -615,7 +615,7 @@ func (l *Conn) GSSAPIBind(client GSSAPIClient, servicePrincipal, authzid string)
 
 // GSSAPIBindRequest performs the GSSAPI SASL bind using the provided GSSAPI client.
 func (l *Conn) GSSAPIBindRequest(client GSSAPIClient, req *GSSAPIBindRequest) error {
-	fmt.Printf("[debug] ldap/v3/ldap.Conn.GSSAPIBindRequest()\n")
+	fmt.Printf("[debug] ldap/v3/bind.go::ldap.Conn.GSSAPIBindRequest()\n")
 	//nolint:errcheck
 	defer client.DeleteSecContext()
 
@@ -662,7 +662,7 @@ func (l *Conn) GSSAPIBindRequest(client GSSAPIClient, req *GSSAPIBindRequest) er
 }
 
 func (l *Conn) saslBindTokenExchange(reqControls []Control, reqToken []byte) ([]byte, error) {
-	fmt.Printf("[debug] ldap/v3/ldap.Conn.saslBindTokenExchange()\n")
+	fmt.Printf("[debug] ldap/v3/bind.go::ldap.Conn.saslBindTokenExchange()\n")
 	// Construct LDAP Bind request with GSSAPI SASL mechanism.
 	envelope := ber.Encode(ber.ClassUniversal, ber.TypeConstructed, ber.TagSequence, nil, "LDAP Request")
 	envelope.AppendChild(ber.NewInteger(ber.ClassUniversal, ber.TypePrimitive, ber.TagInteger, l.nextMessageID(), "MessageID"))
