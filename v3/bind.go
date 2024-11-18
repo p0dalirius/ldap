@@ -602,6 +602,8 @@ type GSSAPIBindRequest struct {
 	AuthZID string
 	// (Optional) Controls to send with the bind request
 	Controls []Control
+	// (Optional) APOptions
+	APOptions []int
 }
 
 // GSSAPIBind performs the GSSAPI SASL bind using the provided GSSAPI client.
@@ -611,13 +613,13 @@ func (l *Conn) GSSAPIBind(client GSSAPIClient, servicePrincipal, authzid string)
 		&GSSAPIBindRequest{
 			ServicePrincipalName: servicePrincipal,
 			AuthZID:              authzid,
+			APOptions:            []int{},
 		},
-		[]int{},
 	)
 }
 
 // GSSAPIBindRequest performs the GSSAPI SASL bind using the provided GSSAPI client.
-func (l *Conn) GSSAPIBindRequest(client GSSAPIClient, req *GSSAPIBindRequest, APOptions []int) error {
+func (l *Conn) GSSAPIBindRequest(client GSSAPIClient, req *GSSAPIBindRequest) error {
 	//nolint:errcheck
 	defer client.DeleteSecContext()
 
@@ -628,7 +630,7 @@ func (l *Conn) GSSAPIBindRequest(client GSSAPIClient, req *GSSAPIBindRequest, AP
 	for {
 		if needInit {
 			// Establish secure context between client and server.
-			reqToken, needInit, err = client.InitSecContext(req.ServicePrincipalName, recvToken, APOptions)
+			reqToken, needInit, err = client.InitSecContext(req.ServicePrincipalName, recvToken, req.APOptions)
 			if err != nil {
 				return err
 			}
