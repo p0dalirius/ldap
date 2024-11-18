@@ -22,7 +22,7 @@ import (
 	"github.com/jcmturner/gokrb5/v8/credentials"
 )
 
-// Client implements ldap.GSSAPIClient interface.
+// Client implements ldapgithub.com/jcmturner/gokrb5/v8/spnego.GSSAPIClient interface.
 type Client struct {
 	*client.Client
 
@@ -226,9 +226,7 @@ func UnmarshalWrapToken(wt *gssapi.WrapToken, data []byte, expectFromAcceptor bo
 	// Is the Token ID correct?
 	expectedWrapTokenId := [2]byte{0x05, 0x04}
 	if !bytes.Equal(expectedWrapTokenId[:], data[0:2]) {
-		return fmt.Errorf("wrong Token ID. Expected %s, was %s",
-			hex.EncodeToString(expectedWrapTokenId[:]),
-			hex.EncodeToString(data[0:2]))
+		return fmt.Errorf("wrong Token ID. Expected %s, was %s", hex.EncodeToString(expectedWrapTokenId[:]), hex.EncodeToString(data[0:2]))
 	}
 
 	// Check the acceptor flag
