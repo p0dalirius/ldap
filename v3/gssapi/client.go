@@ -22,7 +22,7 @@ import (
 	"github.com/jcmturner/gokrb5/v8/credentials"
 )
 
-// Client implements ldapgithub.com/jcmturner/gokrb5/v8/spnego.GSSAPIClient interface.
+// Client implements ldap.GSSAPIClient interface.
 type Client struct {
 	*client.Client
 
