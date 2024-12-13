@@ -28,6 +28,8 @@ type Client struct {
 
 	ekey   types.EncryptionKey
 	Subkey types.EncryptionKey
+
+	APOptions []int
 }
 
 // NewClientWithKeytab creates a new client from a keytab credential.
@@ -103,7 +105,7 @@ func (client *Client) DeleteSecContext() error {
 // InitSecContext initiates the establishment of a security context for
 // GSS-API between the client and server.
 // See RFC 4752 section 3.1.
-func (client *Client) InitSecContext(target string, input []byte, APOptions []int) ([]byte, bool, error) {
+func (client *Client) InitSecContext(target string, input []byte) ([]byte, bool, error) {
 	gssapiFlags := []int{gssapi.ContextFlagInteg, gssapi.ContextFlagConf, gssapi.ContextFlagMutual}
 
 	switch input {
@@ -114,7 +116,7 @@ func (client *Client) InitSecContext(target string, input []byte, APOptions []in
 		}
 		client.ekey = ekey
 
-		token, err := spnego.NewKRB5TokenAPREQ(client.Client, tkt, ekey, gssapiFlags, APOptions)
+		token, err := spnego.NewKRB5TokenAPREQ(client.Client, tkt, ekey, gssapiFlags, client.APOptions)
 		if err != nil {
 			return nil, false, err
 		}

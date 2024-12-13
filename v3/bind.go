@@ -576,7 +576,7 @@ type GSSAPIClient interface {
 	// reply token is received from the server, passing the reply token
 	// to InitSecContext via the token parameters.
 	// See RFC 4752 section 3.1.
-	InitSecContext(target string, token []byte, APOptions []int) (outputToken []byte, needContinue bool, err error)
+	InitSecContext(target string, token []byte) (outputToken []byte, needContinue bool, err error)
 	// NegotiateSaslAuth performs the last step of the Sasl handshake.
 	// It takes a token, which, when unwrapped, describes the servers supported
 	// security layers (first octet) and maximum receive buffer (remaining
@@ -602,8 +602,6 @@ type GSSAPIBindRequest struct {
 	AuthZID string
 	// (Optional) Controls to send with the bind request
 	Controls []Control
-	// (Optional) APOptions
-	APOptions []int
 }
 
 // GSSAPIBind performs the GSSAPI SASL bind using the provided GSSAPI client.
@@ -613,7 +611,6 @@ func (l *Conn) GSSAPIBind(client GSSAPIClient, servicePrincipal, authzid string)
 		&GSSAPIBindRequest{
 			ServicePrincipalName: servicePrincipal,
 			AuthZID:              authzid,
-			APOptions:            []int{},
 		},
 	)
 }
@@ -630,7 +627,7 @@ func (l *Conn) GSSAPIBindRequest(client GSSAPIClient, req *GSSAPIBindRequest) er
 	for {
 		if needInit {
 			// Establish secure context between client and server.
-			reqToken, needInit, err = client.InitSecContext(req.ServicePrincipalName, recvToken, req.APOptions)
+			reqToken, needInit, err = client.InitSecContext(req.ServicePrincipalName, recvToken)
 			if err != nil {
 				return err
 			}
