@@ -166,7 +166,7 @@ func (client *Client) InitSecContext(target string, input []byte) ([]byte, bool,
 // See RFC 4752 section 3.1.
 func (client *Client) NegotiateSaslAuth(input []byte, authzid string) ([]byte, error) {
 	token := &gssapi.WrapToken{}
-	err := UnmarshalWrapToken(token, input, true)
+	err := unmarshalWrapToken(token, input, true)
 	if err != nil {
 		return nil, err
 	}
@@ -219,7 +219,7 @@ func (client *Client) NegotiateSaslAuth(input []byte, authzid string) ([]byte, e
 	return output, nil
 }
 
-func UnmarshalWrapToken(wt *gssapi.WrapToken, data []byte, expectFromAcceptor bool) error {
+func unmarshalWrapToken(wt *gssapi.WrapToken, data []byte, expectFromAcceptor bool) error {
 	// Check if we can read a whole header
 	if len(data) < 16 {
 		return errors.New("bytes shorter than header length")
