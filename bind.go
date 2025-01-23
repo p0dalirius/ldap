@@ -613,10 +613,18 @@ func (l *Conn) GSSAPIBind(client GSSAPIClient, servicePrincipal, authzid string)
 			AuthZID:              authzid,
 		},
 	)
+/*
+	fmt.Printf("[debug] ldap/bind.go::ldap.Conn.GSSAPIBind()\n")
+	return l.GSSAPIBindRequest(client, &GSSAPIBindRequest{
+		ServicePrincipalName: servicePrincipal,
+		AuthZID:              authzid,
+	})
+*/
 }
 
 // GSSAPIBindRequest performs the GSSAPI SASL bind using the provided GSSAPI client.
 func (l *Conn) GSSAPIBindRequest(client GSSAPIClient, req *GSSAPIBindRequest) error {
+	fmt.Printf("[debug] ldap/bind.go::ldap.Conn.GSSAPIBindRequest()\n")
 	//nolint:errcheck
 	defer client.DeleteSecContext()
 
@@ -629,20 +637,29 @@ func (l *Conn) GSSAPIBindRequest(client GSSAPIClient, req *GSSAPIBindRequest) er
 			// Establish secure context between client and server.
 			reqToken, needInit, err = client.InitSecContext(req.ServicePrincipalName, recvToken)
 			if err != nil {
+				fmt.Printf("[debug] ldap/bind.go::ldap.Conn.GSSAPIBindRequest() --> client.InitSecContext(req.ServicePrincipalName, recvToken): %s\n", err)
 				return err
+			} else {
+				fmt.Printf("[debug] ldap/bind.go::ldap.Conn.GSSAPIBindRequest() --> client.InitSecContext(req.ServicePrincipalName, recvToken): succes\n")
 			}
 		} else {
 			// Secure context is set up, perform the last step of SASL handshake.
 			reqToken, err = client.NegotiateSaslAuth(recvToken, req.AuthZID)
 			if err != nil {
+				fmt.Printf("[debug] ldap/bind.go::ldap.Conn.GSSAPIBindRequest() --> client.NegotiateSaslAuth(recvToken, req.AuthZID): %s\n", err)
 				return err
+			} else {
+				fmt.Printf("[debug] ldap/bind.go::ldap.Conn.GSSAPIBindRequest() --> client.NegotiateSaslAuth(recvToken, req.AuthZID): succes\n")
 			}
 		}
 		// Send Bind request containing the current token and extract the
 		// token sent by server.
 		recvToken, err = l.saslBindTokenExchange(req.Controls, reqToken)
 		if err != nil {
+			fmt.Printf("[debug] ldap/bind.go::ldap.Conn.GSSAPIBindRequest() --> l.saslBindTokenExchange(req.Controls, reqToken): %s\n", err)
 			return err
+		} else {
+			fmt.Printf("[debug] ldap/bind.go::ldap.Conn.GSSAPIBindRequest() --> l.saslBindTokenExchange(req.Controls, reqToken): succes\n")
 		}
 
 		if !needInit && len(recvToken) == 0 {
@@ -660,7 +677,8 @@ func (l *Conn) saslBindTokenExchange(reqControls []Control, reqToken []byte) ([]
 
 	request := ber.Encode(ber.ClassApplication, ber.TypeConstructed, ApplicationBindRequest, nil, "Bind Request")
 	request.AppendChild(ber.NewInteger(ber.ClassUniversal, ber.TypePrimitive, ber.TagInteger, 3, "Version"))
-	request.AppendChild(ber.NewString(ber.ClassUniversal, ber.TypePrimitive, ber.TagOctetString, "", "User Name"))
+	// Changed here to Administrator to test
+	request.AppendChild(ber.NewString(ber.ClassUniversal, ber.TypePrimitive, ber.TagOctetString, "Administrator", "User Name"))
 
 	auth := ber.Encode(ber.ClassContext, ber.TypeConstructed, 3, "", "authentication")
 	auth.AppendChild(ber.NewString(ber.ClassUniversal, ber.TypePrimitive, ber.TagOctetString, "GSSAPI", "SASL Mech"))

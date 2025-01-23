@@ -35,6 +35,7 @@ type Client struct {
 // NewClientWithKeytab creates a new client from a keytab credential.
 // Set the realm to empty string to use the default realm from config.
 func NewClientWithKeytab(username, realm, keytabPath, krb5confPath string, settings ...func(*client.Settings)) (*Client, error) {
+	fmt.Printf("[debug] ldap/v3/gssapi/client.go::NewClientWithKeytab()\n")
 	krb5conf, err := config.Load(krb5confPath)
 	if err != nil {
 		return nil, err
@@ -55,6 +56,7 @@ func NewClientWithKeytab(username, realm, keytabPath, krb5confPath string, setti
 // NewClientWithPassword creates a new client from a password credential.
 // Set the realm to empty string to use the default realm from config.
 func NewClientWithPassword(username, realm, password string, krb5confPath string, settings ...func(*client.Settings)) (*Client, error) {
+	fmt.Printf("[debug] ldap/v3/gssapi/client.go::NewClientWithPassword()\n")
 	krb5conf, err := config.Load(krb5confPath)
 	if err != nil {
 		return nil, err
@@ -69,6 +71,7 @@ func NewClientWithPassword(username, realm, password string, krb5confPath string
 
 // NewClientFromCCache creates a new client from a populated client cache.
 func NewClientFromCCache(ccachePath, krb5confPath string, settings ...func(*client.Settings)) (*Client, error) {
+	fmt.Printf("[debug] ldap/v3/gssapi/client.go::NewClientFromCCache()\n")
 	krb5conf, err := config.Load(krb5confPath)
 	if err != nil {
 		return nil, err
@@ -106,6 +109,7 @@ func (client *Client) DeleteSecContext() error {
 // GSS-API between the client and server.
 // See RFC 4752 section 3.1.
 func (client *Client) InitSecContext(target string, input []byte) ([]byte, bool, error) {
+	fmt.Printf("[debug] ldap/v3/gssapi/client.go::client.Client.InitSecContext()\n")
 	gssapiFlags := []int{gssapi.ContextFlagInteg, gssapi.ContextFlagConf, gssapi.ContextFlagMutual}
 
 	switch input {
@@ -119,7 +123,10 @@ func (client *Client) InitSecContext(target string, input []byte) ([]byte, bool,
 		token, err := spnego.NewKRB5TokenAPREQ(client.Client, tkt, ekey, gssapiFlags, []int{flags.APOptionMutualRequired})
 		//token, err := spnego.NewKRB5TokenAPREQ(client.Client, tkt, ekey, gssapiFlags, client.APOptions)
 		if err != nil {
+			fmt.Printf("[debug] spnego.NewKRB5TokenAPREQ(): %s\n", err)
 			return nil, false, err
+		} else {
+			fmt.Printf("[debug] spnego.NewKRB5TokenAPREQ(): success\n")
 		}
 
 		output, err := token.Marshal()
@@ -166,6 +173,7 @@ func (client *Client) InitSecContext(target string, input []byte) ([]byte, bool,
 // NegotiateSaslAuth performs the last step of the SASL handshake.
 // See RFC 4752 section 3.1.
 func (client *Client) NegotiateSaslAuth(input []byte, authzid string) ([]byte, error) {
+	fmt.Printf("[debug] ldap/v3/gssapi/client.go::client.Client.NegotiateSaslAuth()\n")
 	token := &gssapi.WrapToken{}
 	err := unmarshalWrapToken(token, input, true)
 	if err != nil {
@@ -207,6 +215,13 @@ func (client *Client) NegotiateSaslAuth(input []byte, authzid string) ([]byte, e
 		SndSeqNum: 1,
 		Payload:   payload,
 	}
+
+	fmt.Printf("&gssapi.WrapToken{...}\n")
+	fmt.Printf(" | Flags     : %b\n", token.Flags)
+	fmt.Printf(" | EC        : %d\n", token.EC)
+	fmt.Printf(" | RRC       : %d\n", token.RRC)
+	fmt.Printf(" | SndSeqNum : %d\n", token.SndSeqNum)
+	fmt.Printf(" | Payload   : %x\n", token.Payload)
 
 	if err := token.SetCheckSum(key, keyusage.GSSAPI_INITIATOR_SEAL); err != nil {
 		return nil, err
