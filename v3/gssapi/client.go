@@ -116,7 +116,8 @@ func (client *Client) InitSecContext(target string, input []byte) ([]byte, bool,
 		}
 		client.ekey = ekey
 
-		token, err := spnego.NewKRB5TokenAPREQ(client.Client, tkt, ekey, gssapiFlags, client.APOptions)
+		token, err := spnego.NewKRB5TokenAPREQ(client.Client, tkt, ekey, gssapiFlags, []int{flags.APOptionMutualRequired})
+		//token, err := spnego.NewKRB5TokenAPREQ(client.Client, tkt, ekey, gssapiFlags, client.APOptions)
 		if err != nil {
 			return nil, false, err
 		}
